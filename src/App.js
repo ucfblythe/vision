@@ -1,4 +1,7 @@
 import React, {Component } from 'react';
+import Menu from './components/Menu'
+import Content from './Content'
+import './styles/app.css'
 
 class App extends Component
 {
@@ -6,7 +9,8 @@ class App extends Component
     {
         return(
           <div>
-              <h1>Hello World</h1>
+              <Menu />
+              <Content />
           </div>
         );
     }
