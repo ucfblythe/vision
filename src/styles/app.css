@@ -7,12 +7,32 @@
 .navbar
 {
     min-height: 80px;
+    max-height: 5vh;
+}
+
+.navbar-brand img
+{
+    display: inline;
+    margin-left: 25px;
+    vertical-align: top;
+    display: inline;
+    width: 55px;
+    height: 70px;
+    padding-top:10px;
+}
+
+.navbar-brand a
+{
+    display: inline;
+    padding-left: 10px;
+    font-size: 30px;
+    font-family: 'cyberdyne';
 }
 
 .navbar-brand
 {
-    font-family: 'cyberdyne';
-    padding: 0 15px;
+    margin: 0;
+    padding: 0;
     height: 80px;
     line-height: 80px;
 }
@@ -23,11 +43,22 @@
     padding: 9px 10px !important;
 }
 
+.jumbotron
+{
+    text-align: center;
+    background-color: transparent;
+}
+
 @media (min-width: 768px) {
+
     .navbar-nav > li > a {
         /* (80px - line-height of 27px) / 2 = 26.5px */
         padding-top: 26.5px;
         padding-bottom: 26.5px;
         line-height: 27px;
+        float:none;
+        margin:0 auto;
+        display: block;
+        text-align: center;
     }
 }

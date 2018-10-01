@@ -5,9 +5,11 @@ module.exports = {
     entry: './src/Main.js',
     output: {
         path: path.join(__dirname, '/dist'),
-        filename: 'mainbd.js'
+        filename: 'mainbd.js',
+        publicPath: '/'
     },
     devServer: {
+        historyApiFallback: true,
         inline: true,
         port: 8080
     },
