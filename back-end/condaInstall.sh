@@ -1,1 +1,0 @@
-conda create --name visionenv --file ./requirements.txt

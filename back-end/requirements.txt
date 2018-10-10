@@ -1,3 +1,5 @@
+wheel
+setuptools
 aiohttp
 aiortc
 opencv-python
