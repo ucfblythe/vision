@@ -10,7 +10,8 @@ const Landing = () => {
                 <p>A vision based login system that uses deep learning <br/> techniques to extract
                     facial features that can verify your identity.</p>
                 <p>
-                    <Button bsStyle="primary" href="/login">Let's Start</Button>
+                    <Button bsStyle="primary" href="/Register">Register</Button>
+                    <Button bsStyle="primary" href="/Login">Login</Button>
                 </p>
             </Jumbotron>
         </div>

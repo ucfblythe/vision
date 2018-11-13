@@ -43,6 +43,11 @@
     padding: 9px 10px !important;
 }
 
+.button
+{
+    margin-right: 50px;
+}
+
 .jumbotron
 {
     text-align: center;

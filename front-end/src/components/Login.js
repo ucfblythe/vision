@@ -1,13 +1,12 @@
 import React from 'react';
+import VideoRecord from "./VideoRecord"
 
-const Login = () => {
-    return(
-       <div>
-           <div className="frame">
-
-           </div>
-       </div>
-    );
-};
-
-export default Login
+export default class Login extends React.Component
+{
+    render()
+    {
+        return (
+            <VideoRecord/>
+        );
+    }
+}

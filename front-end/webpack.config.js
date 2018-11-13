@@ -2,6 +2,11 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
+    resolve: {
+        alias: {
+            react: path.resolve('node_modules/react'),
+        },
+    },
     entry: './src/Main.js',
     output: {
         path: path.join(__dirname, '/dist'),
@@ -11,7 +16,14 @@ module.exports = {
     devServer: {
         historyApiFallback: true,
         inline: true,
-        port: 8080
+        port: 8080,
+        headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+            'Access-Control-Allow-Credentials': 'true'
+        }
+
     },
     module: {
         rules: [
@@ -51,5 +63,8 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: './index.html'
         })
-    ]
+    ],
+    externals:{
+        settings: JSON.stringify(require("./config/settings.json")), //eslint-disable-line
+    }
 };
