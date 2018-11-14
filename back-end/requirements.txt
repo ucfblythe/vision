@@ -1,6 +1,0 @@
-wheel
-django
-django-tastypie
-psycopg2-binary
-django-cors-headers
-django-cors-middleware
