@@ -11,5 +11,3 @@ class UserResource(ModelResource):
         filtering = {
             'user': ALL,
         }
-        authorization = Authorization()
-        authentication = Authentication()

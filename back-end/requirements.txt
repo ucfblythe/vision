@@ -1,5 +1,6 @@
 wheel
-Django
+django
 django-tastypie
-psycopg2
+psycopg2-binary
 django-cors-headers
+django-cors-middleware
