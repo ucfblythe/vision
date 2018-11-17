@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "Computer Vision Detection, Registration, and Verification System.",
   "main": "index.js",
+  "proxy": "http://localhost:8000",
   "scripts": {
-    "start": "webpack-dev-server --mode development --open --hot",
+    "start": "webpack-dev-server --mode development --open \"chromium\" --hot",
     "build": "webpack --mode production"
   },
   "keywords": [
@@ -21,6 +22,8 @@
     "react-bootstrap": "^0.32.4",
     "react-dom": "^16.5.2",
     "react-router-dom": "^4.3.1",
+    "react-webcam": "^1.0.4",
+    "react-webcam-capture": "^1.2.1",
     "webpack": "^4.20.2",
     "webpack-cli": "^3.1.1",
     "webpack-dev-server": "^3.1.9"

@@ -17,14 +17,19 @@ export default class UserNameCreate extends Component
 
     isNewUserName(e)
     {
+        e.preventDefault();
+
         if(this.isValidUserName())
         {
-            const url = "http://localhost:8000/api/user/?format=json";
+            const url = "http://127.0.0.1:8000/api/user/exists?user="+this.state.value;
             fetch(url)
-                .then(response => {response.json();})
+                .then(response => {return response.json();})
                 .then(data => {
-                    alert(data.user);
-                    this.props.createdHandler(this.state.value);})
+                    if(!data.message)
+                    {
+                        this.props.createdHandler(this.state.value);
+                    }
+                })
                 .catch(err=> alert('ERROR: ' + err));
         }
     }
@@ -46,6 +51,7 @@ export default class UserNameCreate extends Component
 
     textChange(e)
     {
+        e.preventDefault();
         this.setState({value: e.target.value})
     }
 

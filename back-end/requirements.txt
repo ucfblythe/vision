@@ -1,5 +1,0 @@
-wheel
-Django
-django-tastypie
-psycopg2
-django-cors-headers
