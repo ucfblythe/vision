@@ -17,20 +17,24 @@ export default class RegisterComponent extends Component
 
     createdHandler(res)
     {
-        alert(res);
-        this.setState({user: res})
+        this.setState({user: res});
     }
+
     render()
     {
-        if(this.state.user === "") {
-            return (
-                <UserNameCreate createdHandler={this.createdHandler}/>
-            );
+        console.log(this.state.user);
+        let cmp;
+
+        if(this.state.user === "")
+        {
+            cmp = <UserNameCreate createdHandler={this.createdHandler}/>;
         }
         else
         {
-            return this.state.user;
+            cmp = <Webcam/>;
         }
+
+        return cmp;
     }
 }
 
