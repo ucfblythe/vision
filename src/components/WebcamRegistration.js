@@ -1,4 +1,5 @@
 import React from 'react';
+import {Button, FormGroup} from 'react-bootstrap';
 import ReactWebCamCapture from './WebcamCapture';
 import FlexView from 'react-flexview'
 import * as faceapi from 'face-api.js'
@@ -8,24 +9,26 @@ class WebcamRegistration extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            vidStream:""
+            vidStream:"",
+            loaded:false
         };
 
-        this.handleGranted = this.handleGranted.bind(this)
-        this.handleStart = this.handleStart.bind(this)
-    }
+        this.handleGranted = this.handleGranted.bind(this);
+        this.handleStart = this.handleStart.bind(this);
+        this.testDetection = this.testDetection.bind(this);
 
+        this.missedCount = 0;
+    }
 
     async componentDidMount() {
         await this.loadModels();
     }
 
     async loadModels () {
-        //await faceapi.loadModels('/')
-        faceapi.loadFaceDetectionModel('http://pseudobrilliant.com/files/weights/');
-        faceapi.loadFaceLandmarkModel('http://pseudobrilliant.com/files/weights/');
-        faceapi.loadFaceRecognitionModel('http://pseudobrilliant.com/files/weights/');
-        this.faceDetection();
+        await faceapi.loadMtcnnModel('http://pseudobrilliant.com/files/weights/');
+        await faceapi.loadFaceDetectionModel('http://pseudobrilliant.com/files/weights/');
+        await faceapi.loadFaceLandmarkModel('http://pseudobrilliant.com/files/weights/');
+        await faceapi.loadFaceRecognitionModel('http://pseudobrilliant.com/files/weights/');
     }
 
     async faceDetection() {
@@ -33,7 +36,7 @@ class WebcamRegistration extends React.Component {
             // number of scaled versions of the input image passed through the CNN
             // of the first stage, lower numbers will result in lower inference time,
             // but will also be less accurate
-            maxNumScales: 10,
+            maxNumScales: 100,
             // scale factor used to calculate the scale steps of the image
             // pyramid used in stage 1
             scaleFactor: 0.709,
@@ -42,15 +45,32 @@ class WebcamRegistration extends React.Component {
             scoreThresholds: [0.6, 0.7, 0.7],
             // mininum face size to expect, the higher the faster processing will be,
             // but smaller faces won't be detected
-            minFaceSize: 200
+            minFaceSize: 100
         };
 
+        const context = this.canvas.getContext('2d');
 
         const mtcnnResults = await faceapi.mtcnn(this.video, mtcnnForwardParams);
-        faceapi.drawDetection('overlay', mtcnnResults.map(res => res.faceDetection), { withScore: false });
+
+        if(mtcnnResults.length !== 0)
+        {
+            if(this.state.loaded === false)
+            {
+                this.setState({loaded:true})
+            }
+
+            context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+
+        faceapi.drawDetection(this.canvas, mtcnnResults.map(res => res.faceDetection),
+            { withScore:false, boxColor:'LightGreen'});
 
     }
 
+    testDetection()
+    {
+        this.faceDetection();
+    }
 
     handleGranted()
     {
@@ -75,7 +95,7 @@ class WebcamRegistration extends React.Component {
     render() {
 
         return (
-                <div style={{position: 'relative'}} className="margin">
+            <FlexView hAlignContent='center'>
                 <ReactWebCamCapture
                     constraints={{ audio: false, video: true }}
                     timeSlice={10}
@@ -83,15 +103,20 @@ class WebcamRegistration extends React.Component {
                     onDenied={this.handleDenied}
                     onError={this.handleError}
                     onStart={this.handleStart}
+                    handleUpdate={this.testDetection}
                     render={() =>
-                        <video autoPlay
-                               ref={(ref) => {
-                            this.video = ref;}}>
-
-                        </video>
+                        <div style={{position: 'relative'}} className="margin">
+                            <video autoPlay muted id='inputVideo' width={640} height={480}
+                                   ref={(ref) => {this.video = ref;}}>
+                            </video>
+                            <canvas id="overlay" width={640} height={480} style={{ position: 'absolute', top: '0', left: '0', size:'auto' }}
+                                    ref={(ref) => { this.canvas = ref;}}/>
+                            <Button bsStyle={this.state.loaded ? 'success' : 'warning'} block>
+                                {this.state.loaded ?  'Complete Registration' : 'loading...' }
+                            </Button>
+                        </div>
                     } />
-                <canvas id="overlay"/>
-                </div>
+            </FlexView>
         );
     }
 }

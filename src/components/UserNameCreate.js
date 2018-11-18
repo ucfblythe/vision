@@ -94,7 +94,7 @@ export default class UserNameCreate extends Component
     {
         return (
             <Form inline>
-                <Col xsOffset={4} xs={6} mdOffset={4}lgOffset={5}>
+                <Col xsOffset={4} xs={5} sm={5} mdOffset={4} lgOffset={5}>
                     <FormGroup controlId="formInlineName" validationState={this.validateUserName()}>
                         <ControlLabel style={{display:'inline', marginRight:'10px', fontSize:'20px'}}>Name</ControlLabel>
                         <FormControl style={{display:'inline', marginRight:'10px'}} type="text"
@@ -103,7 +103,7 @@ export default class UserNameCreate extends Component
                                      onChange={this.handleChange}
                         />
                         <Button type="submit" bsStyle="primary" style={{display:'inline', marginRight:'10px'}}
-                                onClick={this.handleSubmit}>Create</Button>
+                                onClick={this.handleSubmit}>Register</Button>
                         <HelpBlock style={{textAlign:'center'}}>Begin registration by entering a username</HelpBlock>
                     </FormGroup>
                 </Col>

@@ -7,7 +7,7 @@ module.exports = {
             react: path.resolve('node_modules/react'),
         },
     },
-    entry:['babel-polyfill', './src/Main.js'],
+    entry:['./src/Main.js'],
     output: {
         path: path.join(__dirname, '/dist'),
         filename: 'mainbd.js',
@@ -57,7 +57,7 @@ module.exports = {
     },
     plugins:[
         new HtmlWebpackPlugin({
-            template: './index.html'
+            template: './index.html',
         })
     ],
     externals:{

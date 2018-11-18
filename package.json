@@ -18,7 +18,9 @@
   "author": "cblythe",
   "license": "ISC",
   "dependencies": {
+    "babel-polyfill": "^6.26.0",
     "face-api.js": "^0.16.0",
+    "idempotent-babel-polyfill": "^7.0.0",
     "react": "^16.5.2",
     "react-bootstrap": "^0.32.4",
     "react-dom": "^16.5.2",
