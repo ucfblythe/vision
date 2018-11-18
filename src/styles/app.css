@@ -54,6 +54,13 @@
     background-color: transparent;
 }
 
+.input_field{
+    float: none;
+    display: inline;
+    width: auto;
+    margin: 0 50px;
+}
+
 @media (min-width: 768px) {
 
     .navbar-nav > li > a {

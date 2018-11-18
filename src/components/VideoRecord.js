@@ -1,6 +1,16 @@
 import React from 'react';
-import ReactWebCamCapture from 'react-webcam-capture';
+import ReactWebCamCapture from './WebcamCapture';
 class VideoRecord extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            vidStream:""
+        };
+
+        this.handleGranted = this.handleGranted.bind(this)
+        this.handleStart = this.handleStart.bind(this)
+    }
 
     handleGranted()
     {
@@ -9,12 +19,12 @@ class VideoRecord extends React.Component {
 
     handleDenied(error)
     {
-        alert(error);
+
     }
 
     handleStart(stream)
     {
-
+        this.video.srcObject = stream;
     }
 
     handleStop()
@@ -47,21 +57,14 @@ class VideoRecord extends React.Component {
                     timeSlice={10}
                     onGranted={this.handleGranted}
                     onDenied={this.handleDenied}
-                    onStart={this.handleStart}
-                    onStop={this.handleStop}
-                    onPause={this.handlePause}
-                    onResume={this.handleResume}
                     onError={this.handleError}
-                    render={({ start, stop, pause, resume }) =>
-                        <div>
-                            <button onClick={start}>Start</button>
-                            <button onClick={stop}>Stop</button>
-                            <button onClick={pause}>Pause</button>
-                            <button onClick={resume}>Resume</button>
+                    onStart={this.handleStart}
+                    render={() =>
+                        <video autoPlay
+                               ref={(ref) => {
+                            this.video = ref;}}>
 
-                            <p>Streaming test</p>
-                            <video autoPlay></video>
-                        </div>
+                        </video>
                     } />
             </div>
         );
