@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import UserNameCreate from './UserNameCreate';
-import Webcam from 'react-webcam';
+import WebcamRegistration from './WebcamRegistration';
 export default class RegisterComponent extends Component
 {
     constructor(props) {
@@ -31,7 +31,7 @@ export default class RegisterComponent extends Component
         }
         else
         {
-            cmp = <Webcam/>;
+            cmp = <WebcamRegistration/>;
         }
 
         return cmp;

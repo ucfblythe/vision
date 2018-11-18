@@ -1,5 +1,6 @@
 import React,{Component} from 'react';
-import {Button, Form, FormGroup, FormControl, ControlLabel} from 'react-bootstrap';
+import FlexView from 'react-flexview'
+import {Button, Form, FormGroup, FormControl, ControlLabel, HelpBlock, Col, Row} from 'react-bootstrap';
 
 export default class UserNameCreate extends Component
 {
@@ -19,55 +20,94 @@ export default class UserNameCreate extends Component
     {
         e.preventDefault();
 
-        if(this.isValidUserName())
+        if(this.state.valid)
         {
-            const url = "http://127.0.0.1:8000/api/user/exists?user="+this.state.value;
-            fetch(url)
-                .then(response => {return response.json();})
-                .then(data => {
-                    if(!data.message)
-                    {
-                        this.props.createdHandler(this.state.value);
-                    }
-                })
-                .catch(err=> alert('ERROR: ' + err));
+            this.props.createdHandler(this.state.value);
         }
     }
 
     isValidUserName()
     {
-        return this.state.value.length > 5;
+        if(this.state.value.length >= 5)
+        {
+            const url = "http://127.0.0.1:8000/api/user/exists?user="+this.state.value;
+            fetch(url)
+                .then(response => {return response.json();})
+                .then(data => {
+                    this.setState({valid: data.message});
+                    return data;
+                })
+                .catch(err=>
+                {
+                    console.log('ERROR: ' + err);
+                    return false;
+                });
+        }
+        else
+        {
+            this.setState({valid: false});
+        }
     }
 
     validateUserName()
     {
-        if(! this.isValidUserName())
+        if(this.state.value.length < 5 || this.state.value === "john_doe")
         {
             return null;
         }
 
-        return "success";
+        if(this.state.valid)
+        {
+            return "success";
+        }
+        else
+        {
+            return "error";
+        }
     }
 
     textChange(e)
     {
-        e.preventDefault();
-        this.setState({value: e.target.value})
+        let val = e.target.value;
+        this.setState({value: val});
+        if(val.length >= 5)
+        {
+            const url = "http://127.0.0.1:8000/api/user/exists?user="+val;
+            fetch(url)
+                .then(response => {return response.json();})
+                .then(data => {
+                    this.setState({valid: !data.message});
+                    return data;
+                })
+                .catch(err=>
+                {
+                    this.setState({valid: false});
+                    return false;
+                });
+        }
+        else
+        {
+            this.setState({valid: false});
+        }
     }
 
     render()
     {
         return (
             <Form inline>
-                <FormGroup controlId="formInlineName" validationState={this.validateUserName()}>
-                    <ControlLabel>Name</ControlLabel>{' '}
-                    <FormControl type="text"
-                                 placeholder="Please enter a username"
-                                 value={this.state.value}
-                                 onChange={this.handleChange}
-                    />
-                </FormGroup>
-                <Button type="submit" bsStyle="primary" onClick={this.handleSubmit}>Create</Button>
+                <Col xsOffset={4} xs={5} mdOffset={4}lgOffset={5}>
+                    <FormGroup controlId="formInlineName" validationState={this.validateUserName()}>
+                        <ControlLabel style={{display:'inline', marginRight:'10px', fontSize:'20px'}}>Name</ControlLabel>
+                        <FormControl style={{display:'inline', marginRight:'10px'}} type="text"
+                                     placeholder="john_doe"
+                                     value={this.state.value}
+                                     onChange={this.handleChange}
+                        />
+                        <Button type="submit" bsStyle="primary" style={{display:'inline', marginRight:'10px'}}
+                                onClick={this.handleSubmit}>Create</Button>
+                        <HelpBlock style={{textAlign:'center'}}>Begin registration by entering a username</HelpBlock>
+                    </FormGroup>
+                </Col>
             </Form>
         );
     }
