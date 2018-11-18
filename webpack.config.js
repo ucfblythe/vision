@@ -7,7 +7,7 @@ module.exports = {
             react: path.resolve('node_modules/react'),
         },
     },
-    entry: './src/Main.js',
+    entry:['babel-polyfill', './src/Main.js'],
     output: {
         path: path.join(__dirname, '/dist'),
         filename: 'mainbd.js',
@@ -37,7 +37,7 @@ module.exports = {
                 ]
             },
             {
-                test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+                test: /\.(woff(2)?|ttf|eot|svg|bin)(\?v=\d+\.\d+\.\d+)?$/,
                 use: [{
                     loader: 'file-loader',
                     options: {
@@ -51,6 +51,9 @@ module.exports = {
                 use: ['style-loader', 'css-loader']
             }
         ]
+    },
+    node: {
+        fs: "empty"
     },
     plugins:[
         new HtmlWebpackPlugin({

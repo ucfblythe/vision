@@ -1,5 +1,4 @@
 import React,{Component} from 'react';
-import FlexView from 'react-flexview'
 import {Button, Form, FormGroup, FormControl, ControlLabel, HelpBlock, Col, Row} from 'react-bootstrap';
 
 export default class UserNameCreate extends Component
@@ -95,7 +94,7 @@ export default class UserNameCreate extends Component
     {
         return (
             <Form inline>
-                <Col xsOffset={4} xs={5} mdOffset={4}lgOffset={5}>
+                <Col xsOffset={4} xs={6} mdOffset={4}lgOffset={5}>
                     <FormGroup controlId="formInlineName" validationState={this.validateUserName()}>
                         <ControlLabel style={{display:'inline', marginRight:'10px', fontSize:'20px'}}>Name</ControlLabel>
                         <FormControl style={{display:'inline', marginRight:'10px'}} type="text"
