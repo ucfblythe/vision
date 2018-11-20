@@ -25,29 +25,6 @@ export default class UserNameCreate extends Component
         }
     }
 
-    isValidUserName()
-    {
-        if(this.state.value.length >= 5)
-        {
-            const url = "http://127.0.0.1:8000/api/user/exists?user="+this.state.value;
-            fetch(url)
-                .then(response => {return response.json();})
-                .then(data => {
-                    this.setState({valid: data.message});
-                    return data;
-                })
-                .catch(err=>
-                {
-                    console.log('ERROR: ' + err);
-                    return false;
-                });
-        }
-        else
-        {
-            this.setState({valid: false});
-        }
-    }
-
     validateUserName()
     {
         if(this.state.value.length < 5 || this.state.value === "john_doe")
@@ -71,7 +48,7 @@ export default class UserNameCreate extends Component
         this.setState({value: val});
         if(val.length >= 5)
         {
-            const url = "http://127.0.0.1:8000/api/user/exists?user="+val;
+            const url = "https://vision-project.herokuapp.com/api/user/exists?user="+val;
             fetch(url)
                 .then(response => {return response.json();})
                 .then(data => {

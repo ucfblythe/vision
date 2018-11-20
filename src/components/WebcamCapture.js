@@ -171,7 +171,9 @@ class ReactWebCamCapture extends Component {
 ReactWebCamCapture.defaultProps = {
     constraints: {
         audio: true,
-        video: true
+        video: true,
+        width: { ideal: 4096 },
+        height: { ideal: 2160 }
     },
     autoPlay: true,
     className: '',

@@ -10,14 +10,20 @@ class WebcamRegistration extends React.Component {
         super(props);
         this.state = {
             vidStream:"",
-            loaded:false
+            detection:0
         };
 
         this.handleGranted = this.handleGranted.bind(this);
         this.handleStart = this.handleStart.bind(this);
         this.testDetection = this.testDetection.bind(this);
 
-        this.missedCount = 0;
+        this.DetectionCondition = {"LOADING":0, "FAR":1, "CLOSE":2, "SUCCESS":3};
+
+        this.DetectionStateColors = ['gray', 'red', 'yellow', 'lightGreen'];
+
+        this.DetectionButtonState = ['default', 'danger', 'warning', 'success'];
+
+        this.DetectionStateText = ['Loading...', 'Too Far', 'Too Far', 'Complete Registration'];
     }
 
     async componentDidMount() {
@@ -25,10 +31,10 @@ class WebcamRegistration extends React.Component {
     }
 
     async loadModels () {
-        await faceapi.loadMtcnnModel('http://pseudobrilliant.com/files/weights/');
-        await faceapi.loadFaceDetectionModel('http://pseudobrilliant.com/files/weights/');
-        await faceapi.loadFaceLandmarkModel('http://pseudobrilliant.com/files/weights/');
-        await faceapi.loadFaceRecognitionModel('http://pseudobrilliant.com/files/weights/');
+        await faceapi.loadMtcnnModel('https://visionrecog.com/weights');
+        await faceapi.loadFaceDetectionModel('https://visionrecog.com/weights');
+        await faceapi.loadFaceLandmarkModel('https://visionrecog.com/weights');
+        await faceapi.loadFaceRecognitionModel('https://visionrecog.com/weights');
     }
 
     async faceDetection() {
@@ -45,26 +51,45 @@ class WebcamRegistration extends React.Component {
             scoreThresholds: [0.6, 0.7, 0.7],
             // mininum face size to expect, the higher the faster processing will be,
             // but smaller faces won't be detected
-            minFaceSize: 100
+            minFaceSize: 150
         };
 
         const context = this.canvas.getContext('2d');
 
-        const mtcnnResults = await faceapi.mtcnn(this.video, mtcnnForwardParams);
-
-        if(mtcnnResults.length !== 0)
+        const mtcnnResults = await faceapi.detectSingleFace(this.video, new faceapi.MtcnnOptions(mtcnnForwardParams));
+        if(mtcnnResults)
         {
-            if(this.state.loaded === false)
+            context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+            const detectionsForSize = mtcnnResults.forSize(this.video.width, this.video.height);
+
+            if(detectionsForSize.box.width < 125 || detectionsForSize.box.width < 125)
             {
-                this.setState({loaded:true})
+                this.SetDetectionCondition(this.DetectionCondition['FAR']);
+            }
+            else
+            if(detectionsForSize.box.width < 200 || detectionsForSize.box.width < 200)
+            {
+                this.SetDetectionCondition(this.DetectionCondition['CLOSE']);
+            }
+            else
+            {
+                this.SetDetectionCondition(this.DetectionCondition['SUCCESS']);
             }
 
-            context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.canvas.width = this.video.width;
+            this.canvas.height = this.video.height;
+
+            faceapi.drawDetection(this.canvas, detectionsForSize, { withScore: false, boxColor:this.DetectionStateColors[this.state.detection]});
         }
+    }
 
-        faceapi.drawDetection(this.canvas, mtcnnResults.map(res => res.faceDetection),
-            { withScore:false, boxColor:'LightGreen'});
-
+    SetDetectionCondition(cond)
+    {
+        if(this.state.detection !== cond)
+        {
+            this.setState({detection: cond});
+        }
     }
 
     testDetection()
@@ -79,7 +104,7 @@ class WebcamRegistration extends React.Component {
 
     handleDenied(error)
     {
-        alert('Unable to load stream');
+        alert('Error:Unable to load stream!');
     }
 
     handleStart(stream)
@@ -111,8 +136,8 @@ class WebcamRegistration extends React.Component {
                             </video>
                             <canvas id="overlay" width={640} height={480} style={{ position: 'absolute', top: '0', left: '0', size:'auto' }}
                                     ref={(ref) => { this.canvas = ref;}}/>
-                            <Button bsStyle={this.state.loaded ? 'success' : 'warning'} block>
-                                {this.state.loaded ?  'Complete Registration' : 'loading...' }
+                            <Button bsStyle={this.DetectionButtonState[this.state.detection]} block>
+                                {this.DetectionStateText[this.state.detection]}
                             </Button>
                         </div>
                     } />
