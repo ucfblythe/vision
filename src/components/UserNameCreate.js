@@ -48,7 +48,7 @@ export default class UserNameCreate extends Component
         this.setState({value: val});
         if(val.length >= 5)
         {
-            const url = "https://vision-project.herokuapp.com/api/user/exists?user="+val;
+            const url = "https://vision-project.herokuapp.com/api/exists/"+val+"/";
             fetch(url)
                 .then(response => {return response.json();})
                 .then(data => {

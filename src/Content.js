@@ -9,7 +9,7 @@ const Content = () => {
         <Switch>
             <Route exact path="/" component={Landing}/>
             <Route path="/login" component={Login}/>
-            <Route path="/Register" component= {RegisterComponent}/>
+            <Route path="/register" component= {RegisterComponent}/>
         </Switch>
     );
 };

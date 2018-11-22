@@ -10,12 +10,16 @@ class WebcamRegistration extends React.Component {
         super(props);
         this.state = {
             vidStream:"",
-            detection:0
+            detection:0,
+            loaded:false
         };
 
         this.handleGranted = this.handleGranted.bind(this);
         this.handleStart = this.handleStart.bind(this);
         this.testDetection = this.testDetection.bind(this);
+        this.submitRegistration = this.submitRegistration.bind(this);
+
+        this.detected = "";
 
         this.DetectionCondition = {"LOADING":0, "FAR":1, "CLOSE":2, "SUCCESS":3};
 
@@ -24,21 +28,8 @@ class WebcamRegistration extends React.Component {
         this.DetectionButtonState = ['default', 'danger', 'warning', 'success'];
 
         this.DetectionStateText = ['Loading...', 'Too Far', 'Too Far', 'Complete Registration'];
-    }
 
-    async componentDidMount() {
-        await this.loadModels();
-    }
-
-    async loadModels () {
-        await faceapi.loadMtcnnModel('https://visionrecog.com/weights');
-        await faceapi.loadFaceDetectionModel('https://visionrecog.com/weights');
-        await faceapi.loadFaceLandmarkModel('https://visionrecog.com/weights');
-        await faceapi.loadFaceRecognitionModel('https://visionrecog.com/weights');
-    }
-
-    async faceDetection() {
-        const mtcnnForwardParams = {
+        this.mtcnnForwardParams = {
             // number of scaled versions of the input image passed through the CNN
             // of the first stage, lower numbers will result in lower inference time,
             // but will also be less accurate
@@ -53,22 +44,41 @@ class WebcamRegistration extends React.Component {
             // but smaller faces won't be detected
             minFaceSize: 150
         };
+    }
+
+    async componentDidMount() {
+        await this.loadModels();
+    }
+
+    async loadModels () {
+        await faceapi.loadMtcnnModel('https://visionrecog.com/weights');
+        await faceapi.loadFaceDetectionModel('https://visionrecog.com/weights');
+        await faceapi.loadFaceLandmarkModel('https://visionrecog.com/weights');
+        await faceapi.loadFaceRecognitionModel('https://visionrecog.com/weights');
+
+        this.setState({loaded: true});
+    }
+
+    async faceDetection() {
 
         const context = this.canvas.getContext('2d');
 
-        const mtcnnResults = await faceapi.detectSingleFace(this.video, new faceapi.MtcnnOptions(mtcnnForwardParams));
+        const mtcnnResults = await faceapi.detectSingleFace(this.video, new faceapi.MtcnnOptions(this.mtcnnForwardParams));
+
         if(mtcnnResults)
         {
+            this.detected = mtcnnResults;
+
             context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
             const detectionsForSize = mtcnnResults.forSize(this.video.width, this.video.height);
 
-            if(detectionsForSize.box.width < 125 || detectionsForSize.box.width < 125)
+            if(detectionsForSize.box.width < 125 || detectionsForSize.box.width < 125 || mtcnnResults.score < 0.80)
             {
                 this.SetDetectionCondition(this.DetectionCondition['FAR']);
             }
             else
-            if(detectionsForSize.box.width < 200 || detectionsForSize.box.width < 200)
+            if(detectionsForSize.box.width < 200 || detectionsForSize.box.width < 200 || mtcnnResults.score < 0.95)
             {
                 this.SetDetectionCondition(this.DetectionCondition['CLOSE']);
             }
@@ -82,6 +92,11 @@ class WebcamRegistration extends React.Component {
 
             faceapi.drawDetection(this.canvas, detectionsForSize, { withScore: false, boxColor:this.DetectionStateColors[this.state.detection]});
         }
+        else
+        {
+            context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.SetDetectionCondition(this.DetectionCondition['FAR']);
+        }
     }
 
     SetDetectionCondition(cond)
@@ -94,7 +109,10 @@ class WebcamRegistration extends React.Component {
 
     testDetection()
     {
-        this.faceDetection();
+        if(this.state.loaded)
+        {
+            this.faceDetection();
+        }
     }
 
     handleGranted()
@@ -117,6 +135,18 @@ class WebcamRegistration extends React.Component {
         alert(error);
     }
 
+    async submitRegistration()
+    {
+        if(this.state.detection === this.DetectionCondition["SUCCESS"])
+        {
+            const mtcnnResults = await faceapi.detectSingleFace(this.video, new faceapi.MtcnnOptions(this.mtcnnForwardParams))
+                .withFaceLandmarks()
+                .withFaceDescriptor();
+
+            this.props.onSubmit(mtcnnResults.descriptor);
+        }
+    }
+
     render() {
 
         return (
@@ -136,7 +166,8 @@ class WebcamRegistration extends React.Component {
                             </video>
                             <canvas id="overlay" width={640} height={480} style={{ position: 'absolute', top: '0', left: '0', size:'auto' }}
                                     ref={(ref) => { this.canvas = ref;}}/>
-                            <Button bsStyle={this.DetectionButtonState[this.state.detection]} block>
+                            <Button bsStyle={this.DetectionButtonState[this.state.detection]} block
+                            onClick={this.submitRegistration}>
                                 {this.DetectionStateText[this.state.detection]}
                             </Button>
                         </div>

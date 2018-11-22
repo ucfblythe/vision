@@ -7,12 +7,25 @@ export default class RegisterComponent extends Component
         super(props);
         this.state = {
             user: "",
-            center: "",
-            left: "",
-            right: ""
+            descriptor:""
         };
 
-        this.createdHandler = this.createdHandler.bind(this)
+        this.onSubmit = this.onSubmit.bind(this);
+        this.createdHandler = this.createdHandler.bind(this);
+    }
+
+    onSubmit(detection)
+    {
+        this.setState({descriptor: detection.toString()});
+        const data = {user: this.state.user, descriptor: detection.toString()};
+        const url = "https://vision-project.herokuapp.com/api/user/"+this.state.user+"/";
+        fetch(url, {method: 'POST', body: JSON.stringify(data),
+            headers: {"Content-Type": "application/json; charset=utf-8"}
+        })
+            .then(response => {return response.json()})
+            .then(res => console.log(res));
+
+        console.log(data);
     }
 
     createdHandler(res)
@@ -31,7 +44,7 @@ export default class RegisterComponent extends Component
         }
         else
         {
-            cmp = <WebcamRegistration/>;
+            cmp = <WebcamRegistration onSubmit={this.onSubmit}/>;
         }
 
         return cmp;
