@@ -25,7 +25,6 @@ export default class RegisterComponent extends Component
             .then(response => {return response.json()})
             .then(res => console.log(res));
 
-        console.log(data);
     }
 
     createdHandler(res)
@@ -35,7 +34,6 @@ export default class RegisterComponent extends Component
 
     render()
     {
-        console.log(this.state.user);
         let cmp;
 
         if(this.state.user === "")

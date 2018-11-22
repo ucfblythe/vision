@@ -1,7 +1,7 @@
 import React,{Component} from 'react';
 import {Button, Form, FormGroup, FormControl, ControlLabel, HelpBlock, Col, Row} from 'react-bootstrap';
 
-export default class UserNameCreate extends Component
+export default class UserNameLogin extends Component
 {
     constructor(props) {
         super(props);
@@ -12,10 +12,10 @@ export default class UserNameCreate extends Component
         };
 
         this.handleChange = this.textChange.bind(this);
-        this.handleSubmit = this.isNewUserName.bind(this);
+        this.handleSubmit = this.submitUserName.bind(this);
     }
 
-    isNewUserName(e)
+    submitUserName(e)
     {
         e.preventDefault();
 
@@ -52,7 +52,7 @@ export default class UserNameCreate extends Component
             fetch(url)
                 .then(response => {return response.json();})
                 .then(data => {
-                    this.setState({valid: !data.message});
+                    this.setState({valid: data.message});
                     return data;
                 })
                 .catch(err=>
@@ -79,8 +79,8 @@ export default class UserNameCreate extends Component
                                      onChange={this.handleChange}
                         />
                         <Button type="submit" bsStyle="primary" style={{display:'inline', marginRight:'10px'}}
-                                onClick={this.handleSubmit}>Register</Button>
-                        <HelpBlock style={{textAlign:'center'}}>Begin registration by entering a username</HelpBlock>
+                                onClick={this.handleSubmit}>Log in</Button>
+                        <HelpBlock style={{textAlign:'center'}}>Login as a pre-registered user</HelpBlock>
                     </FormGroup>
                 </Col>
             </Form>

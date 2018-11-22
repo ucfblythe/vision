@@ -3,7 +3,7 @@ import {Button} from 'react-bootstrap';
 import FaceAPIComponent from './FaceAPIComponent'
 import FlexView from 'react-flexview'
 
-class WebcamRegistration extends React.Component {
+class WebcamVerification extends React.Component {
 
     constructor(props) {
         super(props);
@@ -16,11 +16,9 @@ class WebcamRegistration extends React.Component {
 
         this.DetectionCondition = {"LOADING":0, "FAR":1, "CLOSE":2, "SUCCESS":3};
 
-        this.DetectionStateColors = ['gray', 'red', 'yellow', 'lightGreen'];
+        this.DetectionButtonState = ['default', 'danger', 'danger', 'success'];
 
-        this.DetectionButtonState = ['default', 'danger', 'warning', 'success'];
-
-        this.DetectionStateText = ['Loading...', 'Too Far', 'Too Far', 'Complete Registration'];
+        this.DetectionStateText = ['Loading...', 'Unable To Verify', 'Unable To Verify', 'Verified!'];
 
         this.detectionChange = this.detectionChange.bind(this);
         this.getDetection = this.getDetection.bind(this);
@@ -46,21 +44,18 @@ class WebcamRegistration extends React.Component {
         return (
             <FlexView hAlignContent='center'>
                 <div style={{max_width: "768px"}}>
-                    <FaceAPIComponent mode="detection" block
-                                      farScore={0.80} farDist={125}
-                                      closeScore={0.90} closeDist={150}
+                    <FaceAPIComponent mode="verification" descriptor={this.props.descriptor}
+                                      farScore={0.60}
+                                      closeScore={0.50}
                                       onDetectionChange={this.detectionChange}
-                                      onDetectionGet={this.submitRegistration}
-                                      ref={(ref) => {this.faceAPICmp = ref;}}
                     />
-                <Button bsStyle={this.DetectionButtonState[this.state.condition]} block
-                        onClick={this.getDetection}>
-                    {this.DetectionStateText[this.state.condition]}
-                </Button>
+                    <Button bsStyle={this.DetectionButtonState[this.state.condition]} block>
+                        {this.DetectionStateText[this.state.condition]}
+                    </Button>
                 </div>
             </FlexView>
         );
     }
 }
 
-export default WebcamRegistration;
+export default WebcamVerification;
