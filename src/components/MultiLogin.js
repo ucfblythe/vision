@@ -1,5 +1,5 @@
 import React from 'react';
-import UserNameLogin from "./UserNameLogin";
+import WebcamIdentification from "./WebcamIdentification";
 import WebcamVerification from "./WebcamVerification";
 
 export default class MultiLogin extends React.Component
@@ -8,10 +8,17 @@ export default class MultiLogin extends React.Component
         super(props);
         this.state = {
             user: "",
-            descriptors:""
+            descriptor:"",
+            loaded:false
         };
 
         this.createdHandler = this.createdHandler.bind(this);
+
+        this.getDescriptors()
+    }
+
+    componentDidMount() {
+        this.setState({loaded:true});
     }
 
     createdHandler(res)
@@ -20,14 +27,19 @@ export default class MultiLogin extends React.Component
         this.getDescriptor(res);
     }
 
-    getDescriptor(res)
+    getDescriptors()
     {
-        const url = "https://vision-project.herokuapp.com/api/user/"+res+"/";
+        const url = "https://vision-project.herokuapp.com/api/users/";
         fetch(url)
             .then(response => {return response.json();})
             .then(data => {
-                this.setState({descriptor: data.descriptor});
-                return data.descriptor;
+                data.forEach(function(dsc)
+                {
+                    dsc.descriptor = new Float32Array(dsc.descriptor.split(",").map(Number));
+                });
+
+                this.setState({descriptor:data});
+                return data;
             })
             .catch(err=>
             {
@@ -37,17 +49,11 @@ export default class MultiLogin extends React.Component
 
     render()
     {
-        let cmp;
-
-        if(this.state.descriptor === "")
+        if(this.state.descriptor)
         {
-            cmp = <UserNameLogin createdHandler={this.createdHandler}/>;
-        }
-        else
-        {
-            cmp = <WebcamVerification descriptor={this.state.descriptor} onSubmit={this.onSubmit}/>;
+            return <WebcamIdentification descriptor={this.state.descriptor}/>;
         }
 
-        return cmp;
+        return "";
     }
 }

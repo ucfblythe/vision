@@ -44,7 +44,6 @@ class ReactWebCamCapture extends Component {
         this.handleFailed = this.handleFailed.bind(this);
     }
 
-
     componentDidMount() {
         this.getUserMedia()
     }
@@ -53,8 +52,11 @@ class ReactWebCamCapture extends Component {
         this.mediaRecorder = null;
         this.mediaChunk = [];
 
-        this.stream.stop();
-        this.stream = null;
+        if(this.stream)
+        {
+            this.stream.stop();
+            this.stream = null;
+        }
     }
 
     handleSuccess(stream){
@@ -120,35 +122,34 @@ class ReactWebCamCapture extends Component {
                 console.warn(`${type} is not supported on your browser.`);
             }
 
-            let mediaRecorder = new MediaRecorder(this.stream, options);
+            if (this.stream) {
+                let mediaRecorder = new MediaRecorder(this.stream, options);
 
-            mediaRecorder.ondataavailable = (ev) =>
-            {
-                if(ev.data && ev.data.size > 0) {
-                    this.mediaChunk.push(ev.data);
+                mediaRecorder.ondataavailable = (ev) => {
+                    if (ev.data && ev.data.size > 0) {
+                        this.mediaChunk.push(ev.data);
 
-                    if(this.props.handleUpdate !== 'undefined')
-                    {
-                        this.props.handleUpdate();
+                        if (this.props.handleUpdate !== 'undefined') {
+                            this.props.handleUpdate();
+                        }
                     }
-                }
-            };
+                };
 
-            this.mediaRecorder = mediaRecorder;
+                this.mediaRecorder = mediaRecorder;
 
-            this.setState({
-                available: true
-            });
+                this.setState({
+                    available: true
+                });
 
-            this.mediaChunk = [];
-            this.mediaRecorder.start(this.props.timeSlice);
+                this.mediaChunk = [];
+                this.mediaRecorder.start(this.props.timeSlice);
 
-            this.setState({
-                recording: true
-            });
+                this.setState({
+                    recording: true
+                });
 
-            this.props.onStart(this.stream);
-
+                this.props.onStart(this.stream);
+            }
         } catch(err) {
             console.log(err)
             console.error('Failed to initialize MediaRecorder.', err)

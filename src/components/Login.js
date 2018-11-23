@@ -26,7 +26,8 @@ export default class Login extends React.Component
         fetch(url)
             .then(response => {return response.json();})
             .then(data => {
-                this.setState({descriptor: data.descriptor});
+                const desc = new Float32Array(data.descriptor.split(",").map(Number));
+                this.setState({descriptor:desc});
                 return data.descriptor;
             })
             .catch(err=>

@@ -19,15 +19,26 @@ class WebcamRegistration extends React.Component {
         this.handleStart = this.handleStart.bind(this);
         this.testDetection = this.testDetection.bind(this);
 
-        if(this.props.descriptor)
-        {
-            this.descriptor = new Float32Array(this.props.descriptor.split(",").map(Number));
-        }
-
         this.DetectionCondition = {"LOADING":0, "FAR":1, "CLOSE":2, "SUCCESS":3};
         this.DetectionStateColors = ['gray', 'red', 'yellow', 'lightGreen'];
-        this.handleModelChange = this.handleModelChange.bind(this)
+        this.handleModelChange = this.handleModelChange.bind(this);
 
+        if(this.props.mode === "identification")
+        {
+            this.getFaceMatcher();
+        }
+    }
+
+    getFaceMatcher()
+    {
+        let index;
+        let descriptors = [];
+        for (index = 0; index < this.props.descriptor.length; index++)
+        {
+            const userData = this.props.descriptor[index];
+            descriptors.push(new faceapi.LabeledFaceDescriptors(userData.user, [userData.descriptor]))
+        }
+        this.faceMatcher = new faceapi.FaceMatcher(descriptors, 0.45);
     }
 
     async componentDidMount() {
@@ -104,7 +115,7 @@ class WebcamRegistration extends React.Component {
 
             const detectionsForSize = results.detection.forSize(this.video.width, this.video.height);
 
-            const dist =  faceapi.euclideanDistance(this.descriptor, results.descriptor);
+            const dist =  faceapi.euclideanDistance(this.props.descriptor, results.descriptor);
 
             if(dist > this.props.farScore)
             {
@@ -124,6 +135,41 @@ class WebcamRegistration extends React.Component {
             this.canvas.height = this.video.height;
 
             faceapi.drawDetection(this.canvas, detectionsForSize, { withScore: false, boxColor:this.DetectionStateColors[this.state.detection]});
+        }
+        else
+        {
+            context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.SetDetectionCondition(this.DetectionCondition['FAR']);
+        }
+    }
+
+    async faceIdentification() {
+
+        const context = this.canvas.getContext('2d');
+
+        const fullFaceDescriptions = await faceapi.detectAllFaces(this.video, this.forwardParams)
+            .withFaceLandmarks().withFaceDescriptors();
+
+        const results = fullFaceDescriptions.map(fd => this.faceMatcher.findBestMatch(fd.descriptor));
+
+        if(results) {
+            context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            let i;
+            let boxesWithText = [];
+            for(i = 0; i < results.length; i++)
+            {
+                const bestMatch = results[i];
+                const box = fullFaceDescriptions[i].detection.box;
+                const text = bestMatch.label;
+                if(text !== "unknown")
+                {
+                    const boxWithText = new faceapi.BoxWithText(box, text);
+                    boxesWithText.push(boxWithText);
+                }
+            }
+
+            faceapi.drawDetection(this.canvas, boxesWithText, {withScore:false, boxColor:'lightGreen'});
+            this.SetDetectionCondition(this.DetectionCondition['SUCCESS']);
         }
         else
         {
@@ -158,6 +204,11 @@ class WebcamRegistration extends React.Component {
             {
                 this.faceVerification()
             }
+            else
+            if(this.props.mode === "identification")
+            {
+                this.faceIdentification()
+            }
         }
     }
 
@@ -179,7 +230,7 @@ class WebcamRegistration extends React.Component {
         {
             case 0:
                 await faceapi.loadSsdMobilenetv1Model('https://visionrecog.com/weights');
-                this.forwardParams = new faceapi.SsdMobilenetv1Options({minConfidence: 0.5, maxResults: 1});
+                this.forwardParams = new faceapi.SsdMobilenetv1Options({minConfidence: 0.5, maxResults: 10});
                 break;
             case 1:
                 await faceapi.loadTinyFaceDetectorModel('https://visionrecog.com/weights');
@@ -187,7 +238,11 @@ class WebcamRegistration extends React.Component {
                 break;
             case 2:
                 await faceapi.loadMtcnnModel('https://visionrecog.com/weights');
-                this.forwardParams = new faceapi.MtcnnOptions({minConfidence: 0.5, maxResults: 1});
+                this.forwardParams = new faceapi.MtcnnOptions({
+                    minFaceSize: 200,
+                    scoreThresholds: [0.6, 0.7, 0.7],
+                    scaleFactor: 0.709,
+                    maxNumScales: 100});
                 break;
         }
 
@@ -206,7 +261,10 @@ class WebcamRegistration extends React.Component {
 
     handleStart(stream)
     {
-        this.video.srcObject = stream;
+        if(this.video)
+        {
+            this.video.srcObject = stream;
+        }
     }
 
     handleError(error)
