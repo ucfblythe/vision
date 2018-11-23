@@ -45,7 +45,7 @@ class WebcamRegistration extends React.Component {
 
         return (
             <FlexView hAlignContent='center'>
-                <div style={{max_width: "768px"}}>
+                <div style={{width: "640px"}}>
                     <FaceAPIComponent mode="detection" block
                                       farScore={0.80} farDist={125}
                                       closeScore={0.90} closeDist={150}
@@ -53,10 +53,10 @@ class WebcamRegistration extends React.Component {
                                       onDetectionGet={this.submitRegistration}
                                       ref={(ref) => {this.faceAPICmp = ref;}}
                     />
-                <Button bsStyle={this.DetectionButtonState[this.state.condition]} block
-                        onClick={this.getDetection}>
-                    {this.DetectionStateText[this.state.condition]}
-                </Button>
+                    <Button bsStyle={this.DetectionButtonState[this.state.condition]} block
+                            onClick={this.getDetection}>
+                        {this.DetectionStateText[this.state.condition]}
+                    </Button>
                 </div>
             </FlexView>
         );

@@ -43,7 +43,7 @@ class WebcamVerification extends React.Component {
 
         return (
             <FlexView hAlignContent='center'>
-                <div style={{max_width: "768px"}}>
+                <div style={{width: "640px"}}>
                     <FaceAPIComponent mode="verification" descriptor={this.props.descriptor}
                                       farScore={0.60}
                                       closeScore={0.50}
